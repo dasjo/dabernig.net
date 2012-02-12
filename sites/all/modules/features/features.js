@@ -1,10 +1,18 @@
-// $Id: features.js,v 1.1.2.5 2009/09/13 23:23:23 yhahn Exp $
 
 Drupal.behaviors.features = function() {
-  // Features management form
-  $('table.features:not(.processed)').each(function() {
-    $(this).addClass('processed');
+  // Features management form package tabs
+  $("ul#features-form-links li a:not(.features-processed)").each(function() {
+    $(this).addClass('features.processed').click(function() {
+      $(".features-package-active").removeClass('features-package-active');
+      var panel = $(this).attr('href').split('#')[1];
+      $("div.package-" + panel).addClass('features-package-active');
+      $(this).addClass('features-package-active');
+      return false;
+    });
+  });
 
+  // Features management form
+  $('table.features:not(.processed)').addClass('processed').each(function() {
     // Check the overridden status of each feature
     Drupal.features.checkStatus();
 
@@ -35,23 +43,23 @@ Drupal.behaviors.features = function() {
   $('.feature-name:not(.processed)').each(function() {
     $('.feature-name')
       .addClass('processed')
-      .after(' <small class="feature-project-suffix">&nbsp;</small>');
-    if ($('.feature-project').val() === $('.feature-name').val().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/_+/g, '_') || $('.feature-project').val() === '') {
-      $('.feature-project').parents('.form-item').hide();
-      $('.feature-name').keyup(function() {
+      .after(' <small class="feature-module-name-suffix">&nbsp;</small>');
+    if ($('.feature-module-name').val() === $('.feature-name').val().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/_+/g, '_') || $('.feature-module-name').val() === '') {
+      $('.feature-module-name').parents('.form-item').hide();
+      $('.feature-name').bind('keyup change', function() {
         var machine = $(this).val().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/_+/g, '_');
         if (machine !== '_' && machine !== '') {
-          $('.feature-project').val(machine);
-          $('.feature-project-suffix').empty().append(' Machine name: ' + machine + ' [').append($('<a href="#">'+ Drupal.t('Edit') +'</a>').click(function() {
-            $('.feature-project').parents('.form-item').show();
-            $('.feature-project-suffix').hide();
+          $('.feature-module-name').val(machine);
+          $('.feature-module-name-suffix').empty().append(' Machine name: ' + machine + ' [').append($('<a href="#">'+ Drupal.t('Edit') +'</a>').click(function() {
+            $('.feature-module-name').parents('.form-item').show();
+            $('.feature-module-name-suffix').hide();
             $('.feature-name').unbind('keyup');
             return false;
           })).append(']');
         }
         else {
-          $('.feature-project').val(machine);
-          $('.feature-project-suffix').text('');
+          $('.feature-module-name').val(machine);
+          $('.feature-module-name-suffix').text('');
         }
       });
       $('.feature-name').keyup();
@@ -61,25 +69,36 @@ Drupal.behaviors.features = function() {
 
 Drupal.features = {
   'checkStatus': function() {
-    $('table.features tbody tr').not('.processed').filter(':first').each(function() {
-      var elem = $(this);
-      $(elem).addClass('processed');
-      var uri = $(this).find('a.admin-check').attr('href');
+    if ($('table.features').is('.loading')) {
+      return;
+    }
+    $('table.features tbody tr:not(.processed):first').addClass('processed').each(function() {
+      var uri = $(this).find('a.admin-check').attr('href'), elem = $(this);
       if (uri) {
+        $('table.features').addClass('loading');
         $.get(uri, [], function(data) {
           $(elem).find('.admin-loading').hide();
-          if (data.status == 1) {
-            $(elem).find('.admin-overridden').show();
+          switch (data.storage) {
+            case 3:
+              $(elem).find('.admin-rebuilding').show();
+              break;
+            case 2:
+              $(elem).find('.admin-needs-review').show();
+              break;
+            case 1:
+              $(elem).find('.admin-overridden').show();
+              break;
+            default:
+              $(elem).find('.admin-default').show();
+              break;
           }
-          else {
-            $(elem).find('.admin-default').show();
-          }
+          $('table.features').removeClass('loading');
           Drupal.features.checkStatus();
         }, 'json');
       }
       else {
-          Drupal.features.checkStatus();
-        }
+        Drupal.features.checkStatus();
+      }
     });
   }
 };

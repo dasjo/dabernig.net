@@ -1,5 +1,5 @@
 <?php
-// $Id: draggableviews.install,v 1.6.2.9 2009/08/21 14:47:09 sevi Exp $
+// $Id: draggableviews.install,v 1.6.2.10 2010/01/11 10:36:31 sevi Exp $
 
 /**
  * @file
@@ -99,6 +99,7 @@ function draggableviews_install() {
  */
 function draggableviews_uninstall() {
   drupal_uninstall_schema('draggableviews');
+  variable_del('draggableviews_repaired_msg');
 }
 
 /**

@@ -118,7 +118,9 @@ a:hover {
 #admin-sidebar {
 	position: absolute;
 	top: 20px;
-  /* right: 0; */
+  right: 0;
+  background-color: #CDCDCD;
+  z-index: 100;
 }
 
 #site-menu ul.links li {

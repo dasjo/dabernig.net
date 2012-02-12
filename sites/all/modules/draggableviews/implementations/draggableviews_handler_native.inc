@@ -1,5 +1,5 @@
 <?php
-// $Id: draggableviews_handler_native.inc,v 1.1.2.12 2009/09/07 19:14:47 sevi Exp $
+// $Id: draggableviews_handler_native.inc,v 1.1.2.13 2009/10/15 21:39:49 sevi Exp $
 
 /**
  * @file
@@ -11,7 +11,7 @@
  */
 class draggableviews_handler_native extends draggableviews_handler {
   function init($field_name, &$view) {
-    parent::init($field_name, &$view);
+    parent::init($field_name, $view);
     $this->delta = $this->view->field[$field_name]->definition['draggableviews_delta'];
   }
 

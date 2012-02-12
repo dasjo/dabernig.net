@@ -1,5 +1,5 @@
 <?php
-// $Id: draggableviews_handler_cck.inc,v 1.1.2.11 2009/09/14 21:10:13 sevi Exp $
+// $Id: draggableviews_handler_cck.inc,v 1.1.2.12 2009/10/15 21:39:50 sevi Exp $
 
 /**
  * @file
@@ -11,7 +11,7 @@
  */
 class draggableviews_handler_cck extends draggableviews_handler {
   function init($field_name, &$view) {
-    parent::init($field_name, &$view);
+    parent::init($field_name, $view);
 
     $this->options         = $view->display['default']->display_options['style_options'];
     $this->fields          = $view->field;

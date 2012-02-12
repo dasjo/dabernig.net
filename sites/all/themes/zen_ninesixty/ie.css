@@ -1,4 +1,4 @@
-/* $Id: ie.css,v 1.3 2009/09/04 18:13:37 duvien Exp $ */
+/* $Id: ie.css,v 1.2 2009/07/05 20:01:10 duvien Exp $ */
 
 /*
  * IE CSS
@@ -35,13 +35,6 @@
   {
     _zoom: 1; /* Otherwise with a liquid layout, sidebars disappear when resizing the windows in IE6 */
   }
-
-/** Fix logo position and menu for IE6 */
-  #branding { _margin-left:5px; }
-  ul.main-menu { _margin-left:-3px;}
-
-/* Fixed Footer region for IE6 */
-  #footer-region { _margin-left:5px; }
 
   /**************************/
 /* ALPHA TRANSPARENCY FIX */
@@ -154,7 +147,6 @@
   {
     border-bottom: 1px solid #ccc; /* IE doesn't display borders on table rows */
   }
-
 
 /*
  * REFERENCES

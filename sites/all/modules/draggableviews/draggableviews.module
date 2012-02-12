@@ -1,5 +1,5 @@
 <?php
-// $Id: draggableviews.module,v 1.6.2.32 2009/09/15 21:47:12 sevi Exp $
+// $Id: draggableviews.module,v 1.6.2.40 2010/10/19 21:10:03 dixon Exp $
 
 /**
  * @file
@@ -89,12 +89,13 @@ function draggableviews_forms() {
 /**
  * Build the form
  */
-function draggableviews_view_draggabletable_form($form_state, &$style_plugin) {
+function draggableviews_view_draggabletable_form($form_state, $style_plugin) {
   $view = $style_plugin->view;
+  $options = $view->style_plugin->options;
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Save'),
+    '#value' => t(isset($options['draggableviews_button_text']) ? $options['draggableviews_button_text'] : t('Save order')),
   );
   $form['#submit'][] = 'draggableviews_view_draggabletable_form_submit';
   // Use pager information and all exposed input data to build the query.
@@ -217,6 +218,7 @@ function draggableviews_views_pre_execute(&$view) {
   $view->draggableviews_info = &$info;
 
   // We want the view to execute the count query. New nodes which should be added to the very end will use this value.
+  // @todo: Deprecated: If paging is not used the count query will not be executed anyway. the $view->total_rows property is not needed anymore. It has been replaced with 999999999999.
   $view->get_total_rows = TRUE;
 
   $info['pager'] = $info['view']->pager;
@@ -249,19 +251,20 @@ function draggableviews_views_pre_execute(&$view) {
       // even if the user doesn't have permissions.
     }
     else {
+      // We just extend the visible window.
+      $first_index  = ($info['pager']['current_page'] * $info['pager']['items_per_page']);
+      $last_index   = $first_index + $info['pager']['items_per_page'] - 1;
+
       // When we deal with simple lists permission checks must be done right now (differently to hierarchies).
       if (user_access('Allow Reordering') && !$info['locked']) {
-        // We just extend the visible window.
-        $first_index  = ($info['pager']['current_page'] * $info['pager']['items_per_page']);
-        $last_index   = $first_index + $info['pager']['items_per_page'] - 1;
         // Add extensions.
         $first_index -= $info['view_window_extensions']['extension_top'];
         $last_index  += $info['view_window_extensions']['extension_bottom'];
         if ($first_index < 0) $first_index = 0;
-
-        $info['view']->pager['items_per_page'] = $last_index - $first_index + 1;
-        $info['view']->pager['offset']         = $first_index + $info['pager']['offset'];
       }
+
+      $info['view']->pager['items_per_page'] = $last_index - $first_index + 1;
+      $info['view']->pager['offset']         = $first_index + $info['pager']['offset'];
     }
   }
 }
@@ -328,7 +331,7 @@ function draggableviews_views_pre_render(&$view) {
       $range = _draggableviews_extend_view_window($info, TRUE);
 
       if (drupal_strlen(variable_get('draggableviews_repaired_msg', 'The structure was broken. It has been repaired.')) > 0) {
-        drupal_set_message(variable_get('draggableviews_repaired_msg', 'The structure was broken. It has been repaired.'));
+        drupal_set_message(filter_xss(variable_get('draggableviews_repaired_msg', 'The structure was broken. It has been repaired.')));
       }
     }
   }
@@ -508,7 +511,7 @@ function draggableviews_perm() {
  */
 function draggableviews_draggableviews_style_plugin_form_alter(&$form, $form_state, $style_plugin) {
   // Check for input.
-  if (count($form_state['input']) > 0) {
+  if (!empty($form_state['input']['style_options'])) {
     // Define the input data as the current data.
     $current = $form_state['input']['style_options'];
   }
@@ -528,7 +531,7 @@ function draggableviews_draggableviews_style_plugin_form_alter(&$form, $form_sta
     '#name' => 'draggableviews_arguments',
     '#options' => array('use_args' => t('Use arguments as well as view ID to order nodes.')),
     '#description' => t('If checked, nodes can be reordered for any set of views arguments.  Use with care: If you have many combinations of arguments, your database could become very large.'),
-    '#default_value' => isset($current['draggableviews_arguments']) ? $current['draggableviews_arguments'] : array(),
+    '#default_value' => $current['draggableviews_arguments'],
   );
 }
 
@@ -552,4 +555,14 @@ function draggableviews_views_api() {
     'api' => 2.0,
     'path' => drupal_get_path('module', 'draggableviews') .'/views',
   );
+}
+
+/**
+ * Implementing hook_nodeapi
+ */
+function draggableviews_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  // Remove nodes from the structure if they are deleted.
+  if ($op == 'delete') {
+    db_query('DELETE FROM {draggableviews_structure} WHERE nid = %d', $node->nid);
+  }
 }

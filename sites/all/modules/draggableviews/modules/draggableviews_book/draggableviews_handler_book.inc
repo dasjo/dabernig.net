@@ -1,5 +1,5 @@
 <?php
-// $Id: draggableviews_handler_book.inc,v 1.1.2.2 2009/09/07 19:14:47 sevi Exp $
+// $Id: draggableviews_handler_book.inc,v 1.1.2.3 2009/10/15 21:39:50 sevi Exp $
 
 /**
  * @file
@@ -11,7 +11,7 @@
  */
 class draggableviews_handler_book extends draggableviews_handler {
   function init($field_name, &$view) {
-    parent::init($field_name, &$view);
+    parent::init($field_name, $view);
 
     $this->root = 0;
     // Check if filters or arguments define another root parent.

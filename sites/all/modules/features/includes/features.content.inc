@@ -1,5 +1,4 @@
 <?php
-// $Id: features.content.inc,v 1.1.2.9 2009/08/26 05:13:41 yhahn Exp $
 
 /**
  * Implementation of hook_features_api().
@@ -7,15 +6,36 @@
 function content_features_api() {
   return array(
     'content' => array(
+      'name' => t('CCK'),
       'default_hook' => 'content_default_fields',
+      'default_file' => FEATURES_DEFAULTS_INCLUDED,
+      'feature_source' => TRUE,
     ),
   );
+}
+
+/**
+ * Implementation of hook_features_export_options().
+ */
+function content_features_export_options() {
+  $options = array();
+  foreach (node_get_types('names') as $type => $type_name) {
+    $content_info = content_types($type);
+    if (!empty($content_info['fields'])) {
+      foreach ($content_info['fields'] as $field) {
+        $field_name = isset($field['widget']['label']) ? $field['widget']['label'] : $field['field_name'];
+        $options[content_features_identifier($field)] = "{$type_name}: {$field_name}";
+      }
+    }
+  }
+  return $options;
 }
 
 /**
  * Implementation of hook_features_export().
  */
 function content_features_export($data, &$export, $module_name = '') {
+  features_include_defaults('content');
   $pipe = array();
 
   // The content_default_fields() hook integration is provided by the
@@ -23,24 +43,15 @@ function content_features_export($data, &$export, $module_name = '') {
   $export['dependencies']['features'] = 'features';
 
   // Collect a field to module map
-  $map = array();
-  $modules = module_implements('content_default_fields');
-  foreach ($modules as $module) {
-    $fields = module_invoke($module, 'content_default_fields');
-    foreach ($fields as $field) {
-      $map["{$field['type_name']}-{$field['field_name']}"] = $module;
-    }
-  }
-
+  $map = features_get_default_map('content', NULL, 'content_features_identifier');
   foreach ($data as $instance) {
-    // If this field is already provided by another module, remove the field
-    // and add the other module as a dependency.
+    // If this field is already provided by another module remove the field.
+    // We do not add the other module as a dependency as the field-providing
+    // module may be extending the content type in question.
     if (isset($map[$instance]) && $map[$instance] != $module_name) {
       if (isset($export['features']['content'][$instance])) {
         unset($export['features']['content'][$instance]);
       }
-      $module = $map[$instance];
-      $export['dependencies'][$module] = $module;
     }
     // If the field has not yet been exported, add it
     else {
@@ -49,7 +60,7 @@ function content_features_export($data, &$export, $module_name = '') {
       $field_name = $split[1];
       $field = content_fields($field_name, $type_name);
 
-      if ($field) {
+      if (!empty($field)) {
         // Add field item instance for later export.
         $export['features']['content'][$instance] = $instance;
 
@@ -86,7 +97,7 @@ function content_features_export($data, &$export, $module_name = '') {
 /**
  * Implementation of hook_features_export_render().
  */
-function content_features_export_render($module = 'foo', $data) {
+function content_features_export_render($module, $data) {
   $translatables = $code = array();
 
   $code[] = '  $fields = array();';
@@ -95,19 +106,21 @@ function content_features_export_render($module = 'foo', $data) {
     $instance = explode('-', $instance);
     $type_name = $instance[0];
     $field_name = $instance[1];
+    if ($field = content_fields($field_name, $type_name)) {
+      unset($field['columns']);
+      unset($field['locked']);
+      unset($field['db_storage']);
+      $field_identifier = features_var_export(content_features_identifier($field));
+      $field_export = features_var_export($field, '  ');
 
-    $field = content_fields($field_name, $type_name);
-    unset($field['columns']);
-    unset($field['locked']);
-    unset($field['db_storage']);
+      $code[] = "  // Exported field: {$field_name}";
+      $code[] = "  \$fields[{$field_identifier}] = {$field_export};";
+      $code[] = "";
 
-    $code[] = '  // Exported field: '. $field_name;
-    $code[] = '  $fields[] = '. features_var_export($field, '  ') .';';
-    $code[] = '';
-
-    // Add any labels to translatables array.
-    if (!empty($field['widget']['label'])) {
-      $translatables[] = $field['widget']['label'];
+      // Add any labels to translatables array.
+      if (!empty($field['widget']['label'])) {
+        $translatables[] = $field['widget']['label'];
+      }
     }
   }
   if (!empty($translatables)) {
@@ -120,73 +133,80 @@ function content_features_export_render($module = 'foo', $data) {
 
 /**
  * Implementation of hook_features_revert().
- *
- * @param $module
- * name of module to revert content for
  */
-function content_features_revert($module = NULL) {
-  // Get all fields defined in this feature
-  if (module_hook($module, 'content_default_fields')) {
-    module_load_include('inc', 'content', 'includes/content.crud');
-    $default_fields = module_invoke($module, 'content_default_fields');
-
-    // Update all fields to their default values
-    foreach($default_fields as $field) {
-      // Ensure that the field exists before attempting an update.
-      $params = array('field_name' => $field['field_name'], 'type_name' => $field['type_name']);
-      $field_exists = content_field_instance_read($params);
-      if ($field_exists) {
-        content_field_instance_update($field, FALSE);
-        variable_set('menu_rebuild_needed', TRUE);
-      }
-    }
-  }
-  else {
-    drupal_set_message(t('Could not load default fields.'), 'error');
-    return FALSE;
-  }
-  return TRUE;
+function content_features_revert($module) {
+  content_features_rebuild($module);
 }
 
 /**
  * Implementation of hook_features_rebuild().
  * Rebuilds CCK field definitions from code defaults.
  */
-function content_features_rebuild() {
-  module_load_include('inc', 'content', 'includes/content.crud');
-  content_clear_type_cache(TRUE);
+function content_features_rebuild($module) {
+  if ($fields = features_get_default('content', $module)) {
+    module_load_include('inc', 'content', 'includes/content.crud');
+    content_clear_type_cache(TRUE);
 
-  $fields = module_invoke_all('content_default_fields');
-  foreach ($fields as $field) {
-    $conflicts = array();
-    $existing_field = content_fields($field['field_name']);
-    $existing_instance = content_fields($field['field_name'], $field['type_name']);
+    foreach ($fields as $field) {
+      // We use content_field_instance_read() here so that we can get inactive 
+      // fields too. We can't just pass $field to it as the fnc will add every
+      // item of the array to the WHERE clause.
+      $param = array('field_name' => $field['field_name'], 'type_name' => $field['type_name']);
+      $existing_instance = array_shift(content_field_instance_read($param, TRUE));
 
-    // If field storage doesn't exists, create it
-    if (!$existing_field) {
-      content_field_instance_create($field, FALSE);
+      if (!empty($existing_instance)) {
+        // If this existing instance is inactive, we need to activate it before
+        // running content_field_instance_update().
+        if (empty($existing_instance['widget_active'])) {
+          db_query("UPDATE {". content_instance_tablename() ."} SET widget_active = 1 WHERE field_name = '%s' AND type_name = '%s'", $field['field_name'], $field['type_name']);
+          // We need to clear the type cache again, unfortunately.
+          content_clear_type_cache(TRUE);
+        }
+
+        content_field_instance_update($field, FALSE);
+      }
+      else {
+        // Summary: content_field_instance_create() will fall back to prior
+        // instance values for weight, label, desc if not set. 
+        // See http://drupal.org/node/686240#comment-2786162
+        $field['weight'] = $field['widget']['weight'];
+        $field['label'] = $field['widget']['label'];
+        $field['description'] = $field['widget']['description'];
+        content_field_instance_create($field, FALSE);
+      }
       variable_set('menu_rebuild_needed', TRUE);
     }
-    // If field storage exists, check that storage and key descriptors don't conflict
-    else {
-      // Iterate through field properties to determine compatibility
-      foreach ($field as $key => $value) {
-        $excluded = array('type_name');
-        if (!is_array($value) && !in_array($key, $excluded)) {
-          if ($value !== $existing_field[$key]) {
-            $conflicts[] = $key;
-          }
-        }
-      }
-      if (!empty($conflicts)) {
-        $tokens = array('!field' => $field['field_name'], '!type' => $field['type_name'], '!list' => implode(', ', $conflicts));
-        $message = t('Field <strong>!field</strong> was not created for <strong>!type</strong> because a conflict was detected for the following properties: <em>!list</em>', $tokens);
-        drupal_set_message($message);
-      }
-      else if (!$existing_instance) {
-        content_field_instance_create($field, FALSE);
-        variable_set('menu_rebuild_needed', TRUE);
-      }
+  }
+}
+
+/**
+ * Callback for generating the field exportable identifier for a field.
+ */
+function content_features_identifier($field) {
+  return isset($field['type_name'], $field['field_name']) ? "{$field['type_name']}-{$field['field_name']}" : FALSE;
+}
+
+/**
+ * Helper function: retrieve default fields by node type.
+ */
+function content_features_fields_default($node_type, $reset = FALSE) {
+  static $content_default_fields;
+  if (!isset($content_default_fields) || $reset) {
+    foreach (features_get_default('content') as $field) {
+      $content_default_fields[$field['type_name']][] = $field['field_name'];
     }
   }
+  return isset($content_default_fields[$node_type]) ? $content_default_fields[$node_type] : array();
+}
+
+/**
+ * Helper function: retrieve normal fields by node type.
+ */
+function content_features_fields_normal($node_type) {
+  $normal_fields = array();
+  $content_info = content_types($node_type);
+  if (!empty($content_info['fields'])) {
+    $normal_fields = array_keys($content_info['fields']);
+  }
+  return $normal_fields;
 }

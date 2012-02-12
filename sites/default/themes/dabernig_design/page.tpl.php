@@ -13,13 +13,23 @@
 </head>
 
 <body class="<?php print $body_classes; ?>">
+
+
+  <?php if ($admin_sidebar): ?>
+    <div id="admin-sidebar" class="column sidebar region grid-3">
+  <div id="admin-sidebar-inner">
+      <?php print $admin_sidebar; ?>
+    </div>
+    </div> <!--//end #admin-sidebar-inner -->
+  <?php endif; ?>
+
   <div id="page" class="container-16 clear-block">
     <div id="site-header" class="clear-block">
       <div id="header-inner">
         <?php if ($linked_site_name): ?>
 	        <h1 id="site-name" class="grid-3 clear-block"><?php print $linked_site_name; ?></h1>
 	      <?php endif; ?>
-   
+
     <?php if ($main_menu_links || $secondary_menu_links): ?>
       <div id="site-menu" class="grid-13">
 	  <div id="navbar-inner">
@@ -49,27 +59,19 @@
     </div>
 	</div>
 
-	<?php if ($admin_sidebar): ?>
-    <div id="admin-sidebar" class="column sidebar region grid-3">
-  <div id="admin-sidebar-inner">
-      <?php print $admin_sidebar; ?>
-    </div>
-    </div> <!--//end #admin-sidebar-inner -->
-  <?php endif; ?>
-
   <div id="main" class="column <?php print ns('grid-16', $left, 4, $right, 3) . ' ' . ns('push-4', !$left, 4); ?>">
 	  <div id="content"><div id="content-inner">
-      
+
 	    <?php if($breadcrumb): ?>
 		  <div id="breadcrumb" class="grid-3 alpha">
   			<?php print $breadcrumb; ?>
-		  </div>	
-		<?php endif; ?> 
-		
+		  </div>
+		<?php endif; ?>
+
 	    <?php if(!$breadcrumb && $title): ?>
          <h1 class="title grid-3 alpha" id="page-title"><?php print $title; ?></h1>
         <?php endif; ?>
-			
+
       <?php if ($tabs): ?>
         <div class="tabs"><?php print $tabs; ?></div>
       <?php endif; ?>
@@ -88,11 +90,11 @@
       <?php if (!$content_indent): ?>
 			<div id="main-content" class="region clear-block">
 			<?php endif; ?>
-			
+
 		  <?php if(!($node->type == 'work') && $breadcrumb && $title): // work title rendered in content-field-field_credits.tpl.php ?>
 	      	<h1 class="title normal" id="page-title"><?php print $title; ?></h1>
 		  <?php endif; ?>
-		  	
+
         <?php print $content; ?>
       </div> <!-- //end #main-content -->
 
