@@ -1,0 +1,182 @@
+/* headings */ 
+
+h2 { 
+  font-size: 1em;
+  margin-bottom: 2em;
+}
+
+/* films listing */
+.view-films .views-field-field-images-fid {
+  float: left;
+  margin-right: 1em;
+}
+
+.view-films .views-row {
+  clear: left; 
+  padding-top: 2em;
+}
+
+/* work page */
+.node-type-work .field-field-images .field-item {
+  float: left;
+  margin-right: 1em;
+}
+
+.node-type-work .field-field-credits {
+  clear: left;
+}
+
+/* work reviews listing */
+.view-film-texts .views-row {
+  margin-bottom: 1em;
+}
+.view-film-texts p {
+  margin-bottom: 0.5em;
+}
+.view-film-texts .views-field-field-source-value {
+  text-align: right;
+  margin-bottom: 4em;
+}
+
+/* fotos */
+
+.page-foto .views-field-field-images-fid { float: right; }
+.page-foto .views-field-field-images-fid .field-item { display : inline; margin-left: 0.3em; }
+
+/* forms */
+
+#edit-field-work-category-value-Film-wrapper,
+  #edit-field-work-category-value-Foto-wrapper,
+  #edit-field-work-category-value-Text-wrapper,
+  #edit-field-work-category-value-Objekt-wrapper,
+  #edit-field-work-category-value-Bau-wrapper {
+  display: inline;
+}
+
+
+/* general */
+body {
+  font-family: Courier New;
+}
+
+
+
+
+
+/* $Id: styles.css,v 1.1 2009/06/26 00:33:39 duvien Exp $ */
+
+h1#site-name {
+  margin-bottom: 0;
+}
+
+#site-header,
+#site-subheader,
+#footer-region,
+.column,
+.node,
+.comment,
+.block {
+  margin-bottom: 1.5em;
+}
+
+/* HTML Element */
+pre, code
+  {
+    font-size: 1.0em; /* Monospace fonts can be hard to read */
+    font-family: "Bitstream Vera Sans Mono", "Courier New", monospace;
+  }
+
+table
+  {
+    border-collapse: collapse;
+    width: 100%; /* Prevent cramped-looking tables */
+  }
+
+  th,
+  thead th,
+  tbody th
+  {
+    text-align: left;
+    padding-right: 0;
+    border-bottom: none;
+  }
+
+  tbody
+  {
+    border-top: none;
+  }
+
+/** abbreviations **/
+  abbr
+  {
+    border-bottom: 1px dotted #ccc;
+    cursor: help;
+    white-space: nowrap;
+  }
+
+  /* Date-based "abbreviations" show computer-friendly timestamps which are not
+     human-friendly. */
+  abbr.created
+  {
+    border: none;
+    cursor: auto;
+    white-space: normal;
+  }
+
+/** images **/
+  img
+  {
+    border: 0;
+  }
+
+/** horizontal rules **/
+  hr
+  {
+    height: 1px;
+    border: 1px solid #ccc;
+  }
+
+
+  fieldset
+  {
+    margin: 1em 0;
+    padding: 0.5em;
+	border:1px solid #ccc;
+  }
+
+fieldset {}
+
+/*
+** Formatting for administration page
+**
+** The admin panel styles are a mess. IE has problems with this so this is
+** only a temporary fix. This should be fixed in core.
+*/
+div.admin-panel {
+  padding: 0;
+}
+
+div.admin-panel .body {
+  padding: 0 !important;
+}
+
+div.admin .left,
+div.admin .right {
+  width: 50%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+div.admin .right .admin-panel {
+  margin-left: 10px;
+}
+
+/* Theme settings */
+#div-zen-debug strong
+  {
+    float: left;
+    width: 90px;
+    margin-left: 0;
+    margin-right: 10px;
+    text-align: left;
+  }

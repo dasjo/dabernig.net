@@ -1,0 +1,310 @@
+/* headings */ 
+
+h1, h1.normal, h2, h3, h4, h5, h6 {
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+h1, #breadcrumb {
+	margin-bottom: 3em;
+}
+
+/* sections listing */
+
+.view-sections .views-field-field-images-fid {
+  text-align: center;
+}
+.view-sections .right a { float: right; }
+.view-sections .text { margin-top: 15px; }
+
+/* sections & films listing */
+
+.view-films .views-field-field-images-fid {
+  float: right;
+}
+
+.view-sections .views-row, .view-films .views-row {
+  clear: left; 
+  padding-top: 2em;
+}
+.view-sections .views-row-first, .view-films .views-row-first {
+	padding-top: 0;
+}
+
+.view-films p {
+	margin-bottom: 0;
+}
+
+/* work page */
+
+#work-title { clear: both; padding: 0; margin: 0;}
+
+.node-type-work h2.title {
+  margin-bottom: 0;
+}
+
+.node-type-work h2 {
+  margin-bottom: 2em;
+}
+
+.node-type-work .field-field-images .field-item {
+  float: left;
+  margin-right: 1em;
+}
+
+.node-type-work .field-field-credits {
+  padding-top: 2em;
+  clear: left;
+}
+
+.node-type-work .field-field-credits p {
+  margin-bottom: 0;
+}
+
+.section-film .node-type-work .field-field-credits {
+  padding-bottom: 2em;
+}
+
+/* work reviews listing */
+.view-film-texts .views-row {
+  margin-bottom: 1em;
+}
+.view-film-texts p {
+  margin-bottom: 0.5em;
+}
+.view-film-texts .views-field-field-source-value {
+  text-align: right;
+  margin-bottom: 4em;
+}
+
+/* fotos */
+
+.page-foto .views-field-field-images-fid .field-item { display : inline; margin-left: 0.3em; }
+
+/* forms */
+
+#edit-field-work-category-value-Film-wrapper,
+  #edit-field-work-category-value-Foto-wrapper,
+  #edit-field-work-category-value-Text-wrapper,
+  #edit-field-work-category-value-Objekt-wrapper,
+  #edit-field-work-category-value-Bau-wrapper,
+	#edit-field-work-category-value-Bibliografie-wrapper {
+  display: inline;
+}
+
+
+/* general */
+
+#site-name a {
+  color: #ff6900;
+  text-decoration: none;
+}
+#site-name a:hover {
+  text-decoration: underline;
+}
+
+body {
+  font-family: Courier New;
+  background-color: #cdcdcd;
+  line-height: 1.2em;
+}
+
+a, a:active, a:focus, a:hover, a:link, a:visited {
+	color: #000;
+}
+a:hover {
+	color: blue;
+}
+
+#admin-sidebar {
+	position: absolute;
+	top: 20px;
+  /* right: 0; */
+}
+
+#site-menu ul.links li {
+	padding: 0 0.5em 0 0;
+}
+
+#breadcrumb, #site-name, #home-link, #page-title {
+  text-align: right;
+}
+#page-title.normal {
+  text-align: left;
+}
+
+#main-content {
+	clear: both;
+}
+
+div.status {
+  clear:both;
+}
+
+
+html {
+	overflow-y: scroll;
+}
+
+p, dl, hr, h1, h2, h3, h4, h5, h6, ol, ul, pre, table, address, fieldset {
+  margin-bottom: 1em;	
+}
+
+
+
+
+/* $Id: styles.css,v 1.1 2009/06/26 00:33:39 duvien Exp $ */
+
+h1#site-name {
+  margin-bottom: 0;
+}
+
+#site-header,
+#site-subheader,
+#footer-region,
+.column,
+.node,
+.comment,
+.block {
+  margin-bottom: 1.5em;
+}
+
+/* HTML Element */
+pre, code
+  {
+    font-size: 1.0em; /* Monospace fonts can be hard to read */
+    font-family: "Bitstream Vera Sans Mono", "Courier New", monospace;
+  }
+
+table
+  {
+    border-collapse: collapse;
+    width: 100%; /* Prevent cramped-looking tables */
+  }
+
+  th,
+  thead th,
+  tbody th
+  {
+    text-align: left;
+    padding-right: 0;
+    border-bottom: none;
+  }
+
+  tbody
+  {
+    border-top: none;
+  }
+
+/** abbreviations **/
+  abbr
+  {
+    border-bottom: 1px dotted #ccc;
+    cursor: help;
+    white-space: nowrap;
+  }
+
+  /* Date-based "abbreviations" show computer-friendly timestamps which are not
+     human-friendly. */
+  abbr.created
+  {
+    border: none;
+    cursor: auto;
+    white-space: normal;
+  }
+
+/** images **/
+  img
+  {
+    border: 0;
+  }
+
+/** horizontal rules **/
+  hr
+  {
+    height: 1px;
+    border: 1px solid #ccc;
+  }
+
+
+  fieldset
+  {
+    margin: 1em 0;
+    padding: 0.5em;
+	border:1px solid #ccc;
+  }
+
+fieldset {}
+
+/*
+** Formatting for administration page
+**
+** The admin panel styles are a mess. IE has problems with this so this is
+** only a temporary fix. This should be fixed in core.
+*/
+div.admin-panel {
+  padding: 0;
+}
+
+div.admin-panel .body {
+  padding: 0 !important;
+}
+
+div.admin .left,
+div.admin .right {
+  width: 50%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+div.admin .right .admin-panel {
+  margin-left: 10px;
+}
+
+/* Theme settings */
+#div-zen-debug strong
+  {
+    float: left;
+    width: 90px;
+    margin-left: 0;
+    margin-right: 10px;
+    text-align: left;
+  }
+
+
+
+
+
+
+	html
+	{
+		height: 100%;
+	}
+
+	body
+	{
+		height: 100%;
+	}
+
+	#page
+	{
+		position: relative;
+		min-height: 100%;
+	}
+
+	* html #page
+	{
+		height: 100%;
+	}
+
+  #main {
+    padding-bottom: 4em;
+  }
+
+	#footer
+	{
+		position: absolute;
+		bottom: 0;
+	}
+
+  #footer .design { position: relative; left: 77px; }
+
