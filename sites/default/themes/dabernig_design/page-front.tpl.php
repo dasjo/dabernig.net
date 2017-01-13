@@ -132,7 +132,7 @@
 	  </div> <!--//end #footer-inner -->
     <?php endif; ?>
 
-      <div class="gallery grid-8 push-2"><a href="http://www.galerieandreashuber.at/">Galerie Andreas Huber</a>&nbsp;&nbsp;&nbsp;<a href="http://www.wilfriedlentz.com/">Wilfried Lentz</a></div>
+      <div class="gallery grid-8 push-2"><a href="http://www.wilfriedlentz.com/">Wilfried Lentz</a></div>
       <div class="design grid-5 push-1">web design <a href="http://www.dasjo.at">dasjo</a>, powered by <a href="http://www.drupal.org">drupal</a></div>
 
     <?php if ($footer_message): ?>
